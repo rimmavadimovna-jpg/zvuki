@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Звуковые секреты — тренажёр-повторение</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#23203a;
+    --paper:#fef6ec;
+    --teal:#108b8b;
+    --teal-dk:#0a6a6a;
+    --coral:#f0654f;
+    --gold:#f6b93b;
+    --violet:#7a5cc4;
+    --green:#3ca96b;
+    --red:#e0524a;
+    --card:#ffffff;
+    --shadow:0 14px 0 rgba(35,32,58,.12);
+    --soft:0 8px 24px rgba(35,32,58,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(246,185,59,.18), transparent 40%),
+      radial-gradient(circle at 88% 12%, rgba(122,92,196,.16), transparent 42%),
+      radial-gradient(circle at 50% 110%, rgba(16,139,139,.18), transparent 50%),
+      var(--paper);
+    min-height:100vh;
+    display:flex;justify-content:center;align-items:flex-start;
+    padding:22px 16px 60px;
+  }
+  .wrap{width:100%;max-width:660px;}
+
+  /* top bar */
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .logo{
+    font-family:'Baloo 2',cursive;font-weight:800;font-size:20px;color:var(--teal-dk);
+    display:flex;align-items:center;gap:8px;line-height:1;
+  }
+  .logo .bolt{
+    width:34px;height:34px;border-radius:50%;background:var(--gold);
+    display:grid;place-items:center;font-size:19px;box-shadow:0 4px 0 #d99a1f;
+  }
+  .scorepill{
+    margin-left:auto;background:var(--card);border:3px solid var(--ink);
+    border-radius:30px;padding:6px 14px;font-family:'Baloo 2';font-weight:700;
+    box-shadow:0 4px 0 var(--ink);font-size:15px;display:flex;align-items:center;gap:6px;
+  }
+  .scorepill .star{color:var(--gold);}
+
+  /* progress */
+  .progress{
+    height:14px;background:#fff;border:3px solid var(--ink);border-radius:20px;
+    overflow:hidden;box-shadow:0 4px 0 var(--ink);margin-bottom:20px;
+  }
+  .progress > i{
+    display:block;height:100%;width:0;border-radius:20px;
+    background:repeating-linear-gradient(45deg,var(--teal),var(--teal) 12px,var(--teal-dk) 12px,var(--teal-dk) 24px);
+    transition:width .45s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  /* card */
+  .card{
+    background:var(--card);border:3px solid var(--ink);border-radius:26px;
+    box-shadow:var(--shadow);padding:24px 22px 26px;position:relative;
+  }
+  .tag{
+    display:inline-block;font-family:'Baloo 2';font-weight:700;font-size:12.5px;
+    letter-spacing:.08em;text-transform:uppercase;color:#fff;
+    padding:5px 12px;border-radius:20px;margin-bottom:14px;
+  }
+  .q{font-family:'Baloo 2';font-weight:700;font-size:21px;line-height:1.25;margin:0 0 6px;}
+  .qsub{font-size:15px;color:#6b6680;margin:0 0 18px;font-weight:600;}
+
+  /* word display */
+  .word{
+    text-align:center;font-family:'Baloo 2';font-weight:800;
+    font-size:46px;letter-spacing:.5px;margin:6px 0 22px;color:var(--ink);
+    line-height:1;
+  }
+  .word .hi{
+    color:var(--coral);position:relative;
+    text-shadow:0 0 0 rgba(0,0,0,0);
+  }
+  .word .hi::after{
+    content:"";position:absolute;left:-2px;right:-2px;bottom:-6px;height:7px;
+    background:var(--gold);border-radius:6px;z-index:-1;
+  }
+  /* подчёркнутый ь/ъ */
+  .word .sign{
+    color:var(--green);position:relative;padding:0 3px;
+  }
+  .word .sign::after{
+    content:"";position:absolute;left:0;right:0;bottom:-3px;height:6px;
+    background:var(--green);border-radius:5px;
+  }
+
+  /* options */
+  .opts{display:grid;gap:12px;}
+  .opts.three{grid-template-columns:1fr;}
+  .opt{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+    background:#fff;border:3px solid var(--ink);border-radius:18px;
+    padding:15px 16px;font-family:'Nunito';font-weight:700;font-size:17px;color:var(--ink);
+    box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s,background .15s;
+  }
+  .opt:hover{background:#fff8ec;}
+  .opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink);}
+  .opt .badge{
+    flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    font-family:'Baloo 2';font-weight:800;color:#fff;font-size:16px;
+  }
+  .opt.mono{font-family:'Baloo 2';letter-spacing:.5px;font-size:20px;}
+  .opt[disabled]{cursor:default;}
+  .opt.correct{background:#e7f7ee;border-color:var(--green);box-shadow:0 5px 0 var(--green);}
+  .opt.correct .badge{background:var(--green);}
+  .opt.wrong{background:#fdeceb;border-color:var(--red);box-shadow:0 5px 0 var(--red);}
+  .opt.wrong .badge{background:var(--red);}
+  .opt.dim{opacity:.5;}
+
+  /* feedback */
+  .fb{
+    margin-top:18px;border-radius:18px;padding:14px 16px;font-weight:700;font-size:15.5px;
+    display:none;border:3px solid var(--ink);line-height:1.4;
+  }
+  .fb.show{display:block;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .fb.ok{background:#e7f7ee;border-color:var(--green);}
+  .fb.no{background:#fff4e6;border-color:var(--gold);}
+  .fb .fbtitle{font-family:'Baloo 2';font-size:17px;display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+  .fb code{
+    font-family:'Baloo 2';background:#fff;border:2px solid var(--ink);border-radius:8px;
+    padding:1px 7px;font-size:15px;color:var(--teal-dk);
+  }
+
+  .next{
+    margin-top:18px;width:100%;border:none;cursor:pointer;
+    font-family:'Baloo 2';font-weight:800;font-size:19px;color:#fff;
+    background:var(--coral);border:3px solid var(--ink);border-radius:18px;padding:14px;
+    box-shadow:0 6px 0 var(--ink);transition:transform .08s,box-shadow .08s;display:none;
+  }
+  .next.show{display:block;animation:pop .3s;}
+  .next:active{transform:translateY(5px);box-shadow:0 1px 0 var(--ink);}
+
+  @keyframes pop{0%{transform:scale(.92);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+  /* start + end screens */
+  .screen{text-align:center;padding:8px 4px 6px;}
+  .screen h1{font-family:'Baloo 2';font-weight:800;font-size:34px;margin:6px 0 4px;color:var(--teal-dk);line-height:1.05;}
+  .screen .lead{font-size:17px;font-weight:600;color:#5a556e;margin:0 auto 22px;max-width:440px;line-height:1.45;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 auto 26px;max-width:480px;}
+  .chip{background:#fff;border:3px solid var(--ink);border-radius:30px;padding:7px 14px;font-weight:700;font-size:14px;box-shadow:0 4px 0 var(--ink);}
+  .chip b{color:var(--coral);}
+  .bigbtn{
+    border:none;cursor:pointer;font-family:'Baloo 2';font-weight:800;font-size:22px;color:#fff;
+    background:var(--teal);border:3px solid var(--ink);border-radius:22px;padding:16px 40px;
+    box-shadow:0 7px 0 var(--ink);transition:transform .08s,box-shadow .08s;
+  }
+  .bigbtn:active{transform:translateY(6px);box-shadow:0 1px 0 var(--ink);}
+  .mascot{font-size:62px;line-height:1;margin-bottom:6px;display:inline-block;animation:bob 2.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-9px) rotate(3deg);}}
+
+  .resultnum{font-family:'Baloo 2';font-weight:800;font-size:64px;color:var(--coral);line-height:1;margin:4px 0;}
+  .resultnum small{font-size:26px;color:#9a93ad;}
+  .stars{font-size:40px;letter-spacing:6px;margin:6px 0 14px;}
+  .review{text-align:left;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:6px 8px;margin:18px 0 4px;box-shadow:0 5px 0 var(--ink);}
+  .review .row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-bottom:2px dashed #e6e0d4;font-weight:700;font-size:15px;}
+  .review .row:last-child{border-bottom:none;}
+  .review .mark{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:15px;flex:0 0 auto;}
+  .review .mark.y{background:var(--green);}
+  .review .mark.n{background:var(--red);}
+  .review .row span.t{color:#9a93ad;margin-left:auto;font-size:13px;font-weight:700;}
+
+  .hidden{display:none!important;}
+  .footnote{text-align:center;font-size:12.5px;color:#a79f93;margin-top:16px;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar" id="topbar">
+    <div class="logo"><span class="bolt">⚡</span> Звуковые секреты</div>
+    <div class="scorepill"><span class="star">★</span> <span id="score">0</span></div>
+  </div>
+
+  <div class="progress" id="progressWrap"><i id="progressBar"></i></div>
+
+  <!-- START -->
+  <div class="card" id="startCard">
+    <div class="screen">
+      <span class="mascot">🔍</span>
+      <h1>Разминка перед уроком</h1>
+      <p class="lead">Вспомним то, что узнали в прошлый раз. Слова — новые, а секреты те же! Произноси каждое слово вслух 👄</p>
+      <div class="chips">
+        <span class="chip">🎭 <b>Е Ё Ю Я</b> — один звук или два</span>
+        <span class="chip">🔢 Сколько звуков</span>
+        <span class="chip">🔎 Верная транскрипция</span>
+        <span class="chip">✨ Работа <b>ь</b> и <b>ъ</b></span>
+      </div>
+      <button class="bigbtn" onclick="startQuiz()">Поехали! ▶</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="card hidden" id="quizCard">
+    <span class="tag" id="qtag">Раздел</span>
+    <h2 class="q" id="qtext"></h2>
+    <p class="qsub" id="qsub"></p>
+    <div class="word hidden" id="qword"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <button class="next" id="nextBtn" onclick="nextQ()">Дальше →</button>
+  </div>
+
+  <!-- END -->
+  <div class="card hidden" id="endCard">
+    <div class="screen">
+      <span class="mascot" id="endMascot">🏆</span>
+      <h1 id="endTitle">Готово!</h1>
+      <div class="resultnum"><span id="finalScore">0</span><small>/<span id="finalTotal">0</span></small></div>
+      <div class="stars" id="endStars">★★★</div>
+      <p class="lead" id="endMsg"></p>
+      <div class="review" id="review"></div>
+      <button class="bigbtn" style="margin-top:20px" onclick="restart()">↺ Ещё раз</button>
+    </div>
+  </div>
+
+  <p class="footnote">Тренажёр-повторение · «Звуковые секреты» · произноси слова вслух</p>
+</div>
+
+<script>
+/* ====== ВОПРОСЫ (все слова новые, не из презентации) ====== */
+const COLORS = {
+  jot:    {bg:'#7a5cc4'},  // йотированные
+  count:  {bg:'#108b8b'},  // звуки
+  transc: {bg:'#f0654f'},  // транскрипция
+  signs:  {bg:'#3ca96b'}   // ь и ъ
+};
+
+const QUESTIONS = [
+  /* --- БЛОК 1: один звук или два --- */
+  { sec:'jot', tag:'🎭 Один звук или два', short:'ёлка',
+    q:'Сколько звуков даёт буква Ё?',
+    sub:'Прочитай слово вслух',
+    word:['', 'Ё', 'лка'],
+    opts:['ОДИН звук','ДВА звука [й’о]'], correct:1,
+    fb:'Ё стоит <b>в начале слова</b> → даёт два звука <code>[й’о]</code>: ёлка — [й’олка].' },
+
+  { sec:'jot', tag:'🎭 Один звук или два', short:'маяк',
+    q:'Сколько звуков даёт буква Я?',
+    sub:'Прочитай слово вслух',
+    word:['ма', 'Я', 'к'],
+    opts:['ОДИН звук','ДВА звука [й’а]'], correct:1,
+    fb:'Я стоит <b>после гласной</b> (а) → два звука <code>[й’а]</code>: маяк — [май’ак].' },
+
+  { sec:'jot', tag:'🎭 Один звук или два', short:'нёс',
+    q:'Сколько звуков даёт буква Ё?',
+    sub:'Прочитай слово вслух',
+    word:['н', 'Ё', 'с'],
+    opts:['ОДИН звук [о]','ДВА звука [й’о]'], correct:0,
+    fb:'Ё стоит <b>после согласной</b> (н) → один звук <code>[о]</code> и смягчает согласную: [н’ос].' },
+
+  { sec:'jot', tag:'🎭 Один звук или два', short:'объём',
+    q:'Сколько звуков даёт буква Ё?',
+    sub:'Прочитай слово вслух',
+    word:['объ', 'Ё', 'м'],
+    opts:['ОДИН звук','ДВА звука [й’о]'], correct:1,
+    fb:'Ё стоит <b>после Ъ</b> → два звука <code>[й’о]</code>: объём — [абй’ом].' },
+
+  { sec:'jot', tag:'🎭 Один звук или два', short:'дядя',
+    q:'Сколько звуков даёт первая буква Я?',
+    sub:'Прочитай слово вслух',
+    word:['д', 'Я', 'дя'],
+    opts:['ОДИН звук [а]','ДВА звука [й’а]'], correct:0,
+    fb:'Я стоит <b>после согласной</b> (д) → один звук <code>[а]</code> и смягчает: [д’ад’а].' },
+
+  /* --- БЛОК 2: сколько звуков в слове --- */
+  { sec:'count', tag:'🔢 Сколько звуков', short:'конь',
+    q:'Сколько ЗВУКОВ в слове?',
+    sub:'Букв 4. А звуков? Помни про ь',
+    word:['конь'],
+    opts:['4 звука','3 звука','2 звука'], correct:1,
+    fb:'Ь <b>звука не даёт</b>, он только смягчает: [кон’] — 3 звука.' },
+
+  { sec:'count', tag:'🔢 Сколько звуков', short:'ёж',
+    q:'Сколько ЗВУКОВ в слове?',
+    sub:'Букв 2. А звуков?',
+    word:['ёж'],
+    opts:['2 звука','3 звука','4 звука'], correct:1,
+    fb:'Ё в начале даёт [й’о], Ж на конце оглушается: [й’ош] — 3 звука.' },
+
+  { sec:'count', tag:'🔢 Сколько звуков', short:'маяк',
+    q:'Сколько ЗВУКОВ в слове?',
+    sub:'Букв 4. А звуков?',
+    word:['маяк'],
+    opts:['4 звука','5 звуков','3 звука'], correct:1,
+    fb:'Я после гласной даёт [й’а]: [май’ак] — 5 звуков, на один больше, чем букв!' },
+
+  { sec:'count', tag:'🔢 Сколько звуков', short:'пень',
+    q:'Сколько ЗВУКОВ в слове?',
+    sub:'Букв 4. А звуков?',
+    word:['пень'],
+    opts:['3 звука','4 звука','2 звука'], correct:0,
+    fb:'Ь только смягчает Н, звука не даёт: [п’эн’] — 3 звука.' },
+
+  /* --- БЛОК 3: верная транскрипция --- */
+  { sec:'transc', tag:'🔎 Звуковая лупа', short:'ёлка',
+    q:'Как звучит слово на самом деле?',
+    sub:'Выбери верную транскрипцию',
+    word:['ёлка'],
+    opts:['[ёлка]','[йолка]','[й’олка]'], correct:2, mono:true,
+    fb:'В транскрипции нет букв ё; мягкий [й’] пишем с апострофом: <code>[й’олка]</code>.' },
+
+  { sec:'transc', tag:'🔎 Звуковая лупа', short:'лью',
+    q:'Как звучит слово на самом деле?',
+    sub:'Выбери верную транскрипцию',
+    word:['лью'],
+    opts:['[л’у]','[л’й’у]','[лй’у]'], correct:1, mono:true,
+    fb:'Ь делает Л мягким <i>и</i> сам даёт [й’] перед Ю: <code>[л’й’у]</code>.' },
+
+  { sec:'transc', tag:'🔎 Звуковая лупа', short:'конь',
+    q:'Как звучит слово на самом деле?',
+    sub:'Выбери верную транскрипцию',
+    word:['конь'],
+    opts:['[кон]','[кон’]','[кон’й’]'], correct:1, mono:true,
+    fb:'Ь смягчает Н и звука не добавляет: <code>[кон’]</code>.' },
+
+  { sec:'transc', tag:'🔎 Звуковая лупа', short:'маяк',
+    q:'Как звучит слово на самом деле?',
+    sub:'Выбери верную транскрипцию',
+    word:['маяк'],
+    opts:['[майак]','[май’ак]','[м’ай’ак]'], correct:1, mono:true,
+    fb:'М твёрдый, а Я после гласной даёт [й’а]: <code>[май’ак]</code>.' },
+
+  /* --- БЛОК 4: работа ь и ъ (подчёркиваем знак, выбор из двух) --- */
+  { sec:'signs', tag:'✨ Работа знака', short:'пень', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['пен', 'ь', ''],
+    opts:['Мягкость','Разделитель'], correct:0,
+    fb:'Ь стоит на конце после согласной → <b>смягчает</b> Н, нового звука нет: [п’эн’].' },
+
+  { sec:'signs', tag:'✨ Работа знака', short:'платье', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['плат', 'ь', 'е'],
+    opts:['Мягкость','Разделитель'], correct:1,
+    fb:'Ь стоит перед Е → <b>разделяет</b>, появляется звук [й’]: [плат’й’э].' },
+
+  { sec:'signs', tag:'✨ Работа знака', short:'въезд', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['в', 'ъ', 'езд'],
+    opts:['Мягкость','Разделитель'], correct:1,
+    fb:'Ъ стоит перед Е → <b>разделитель</b>, появляется [й’]: [вй’эст].' },
+
+  { sec:'signs', tag:'✨ Работа знака', short:'морковь', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['морков', 'ь', ''],
+    opts:['Мягкость','Разделитель'], correct:0,
+    fb:'Ь на конце слова после согласной → <b>смягчает</b> В: [маркоф’].' },
+
+  { sec:'signs', tag:'✨ Работа знака', short:'воробьи', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['вороб', 'ь', 'и'],
+    opts:['Мягкость','Разделитель'], correct:1,
+    fb:'Ь стоит перед И → <b>разделитель</b>, появляется [й’]: [вараб’й’и].' },
+
+  { sec:'signs', tag:'✨ Работа знака', short:'объятия', signMode:true,
+    q:'Какую работу выполняет подчёркнутый знак?',
+    sub:'Прочитай слово вслух',
+    word:['об', 'ъ', 'ятия'],
+    opts:['Мягкость','Разделитель'], correct:1,
+    fb:'Ъ стоит перед Я → <b>разделитель</b>, появляется [й’]: [абй’ат’ий’а].' }
+];
+
+/* ====== ЛОГИКА ====== */
+let order = [], idx = 0, score = 0, answered = false, results = [];
+
+function buildWord(parts, useSign){
+  // parts: [целое слово]  ИЛИ  [до, ВЫДЕЛЕННОЕ, после]
+  if(parts.length === 1) return parts[0];
+  const cls = useSign ? 'sign' : 'hi';
+  let html = '';
+  parts.forEach((p,i)=>{
+    if(p === '') return;
+    html += (i === 1) ? `<span class="${cls}">${p}</span>` : p;
+  });
+  return html;
+}
+
+function startQuiz(){
+  order = [...Array(QUESTIONS.length).keys()];
+  idx = 0; score = 0; results = [];
+  document.getElementById('score').textContent = '0';
+  document.getElementById('startCard').classList.add('hidden');
+  document.getElementById('endCard').classList.add('hidden');
+  document.getElementById('quizCard').classList.remove('hidden');
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('progressWrap').style.display='block';
+  renderQ();
+}
+
+function renderQ(){
+  answered = false;
+  const q = QUESTIONS[order[idx]];
+  const c = COLORS[q.sec];
+
+  // progress
+  document.getElementById('progressBar').style.width = (idx/QUESTIONS.length*100) + '%';
+
+  const tag = document.getElementById('qtag');
+  tag.textContent = q.tag + '  ·  ' + (idx+1) + '/' + QUESTIONS.length;
+  tag.style.background = c.bg;
+
+  document.getElementById('qtext').textContent = q.q;
+  document.getElementById('qsub').textContent = q.sub;
+
+  const wordEl = document.getElementById('qword');
+  wordEl.classList.remove('hidden');
+  wordEl.innerHTML = buildWord(q.word, q.signMode);
+
+  const optsEl = document.getElementById('opts');
+  optsEl.innerHTML = '';
+  optsEl.className = 'opts' + (q.opts.length>2 ? ' three' : '');
+  const letters = ['А','Б','В','Г'];
+  q.opts.forEach((o,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt' + (q.mono ? ' mono' : '');
+    b.innerHTML = `<span class="badge" style="background:${c.bg}">${letters[i]}</span><span>${o}</span>`;
+    b.onclick = ()=>choose(i, b);
+    optsEl.appendChild(b);
+  });
+
+  const fb = document.getElementById('fb');
+  fb.className = 'fb'; fb.innerHTML = '';
+  document.getElementById('nextBtn').className = 'next';
+  document.getElementById('nextBtn').textContent = (idx === QUESTIONS.length-1) ? 'Итог 🏁' : 'Дальше →';
+}
+
+function choose(i, btn){
+  if(answered) return;
+  answered = true;
+  const q = QUESTIONS[order[idx]];
+  const buttons = document.querySelectorAll('#opts .opt');
+  buttons.forEach((b,j)=>{
+    b.disabled = true;
+    if(j === q.correct) b.classList.add('correct');
+    else if(j === i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+
+  const ok = (i === q.correct);
+  results.push({short:q.short, ok:ok});
+  const fb = document.getElementById('fb');
+  if(ok){
+    score++;
+    document.getElementById('score').textContent = score;
+    fb.className = 'fb ok show';
+    fb.innerHTML = `<div class="fbtitle">🎉 Верно!</div><div>${q.fb}</div>`;
+  } else {
+    fb.className = 'fb no show';
+    fb.innerHTML = `<div class="fbtitle">🤔 Почти!</div><div>${q.fb}</div>`;
+  }
+  const nb = document.getElementById('nextBtn');
+  nb.classList.add('show');
+}
+
+function nextQ(){
+  idx++;
+  if(idx >= QUESTIONS.length){ showEnd(); return; }
+  renderQ();
+}
+
+function showEnd(){
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('quizCard').classList.add('hidden');
+  const end = document.getElementById('endCard');
+  end.classList.remove('hidden');
+
+  const total = QUESTIONS.length;
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalTotal').textContent = total;
+
+  const pct = score/total;
+  let stars, msg, mascot, title;
+  if(pct === 1){ stars='★★★'; mascot='🏆'; title='Идеально!'; msg='Все секреты раскрыты без единой ошибки. Ты настоящий звуковой детектив!'; }
+  else if(pct >= 0.75){ stars='★★☆'; mascot='🎉'; title='Здорово!'; msg='Почти всё помнишь. Загляни в подсказки по сложным словам — и будет идеально.'; }
+  else if(pct >= 0.5){ stars='★☆☆'; mascot='💪'; title='Хорошее начало!'; msg='Половина секретов уже твоя. Повторим правила про ь, ъ и буквы Е Ё Ю Я — и вперёд.'; }
+  else { stars='☆☆☆'; mascot='🌱'; title='Тренируемся!'; msg='Эти секреты ещё прячутся. Прочитай подсказки, произнеси слова вслух и попробуй снова.'; }
+
+  document.getElementById('endStars').textContent = stars;
+  document.getElementById('endMascot').textContent = mascot;
+  document.getElementById('endTitle').textContent = title;
+  document.getElementById('endMsg').textContent = msg;
+
+  const rev = document.getElementById('review');
+  rev.innerHTML = '';
+  results.forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span class="mark ${r.ok?'y':'n'}">${r.ok?'✓':'✗'}</span>
+                     <span>${r.short}</span>
+                     <span class="t">${r.ok?'верно':'повтори'}</span>`;
+    rev.appendChild(row);
+  });
+}
+
+function restart(){ startQuiz(); }
+</script>
+</body>
+</html>
